@@ -1,16 +1,14 @@
 {
-  "version": "1.1.4-beta",
+  "version": "1.1.5-beta",
   "channel": "beta",
   "prerelease": true,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "BambooBrowser-1.1.4-beta-win-x64.zip",
-  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.4-beta/BambooBrowser-1.1.4-beta-win-x64.zip",
-  "sha256": "0b91c5364ef3d31618452f9f956e09624f5b07f09dd9aa181df7b2b60368463a",
-  "size": 6540466,
-  "releaseNotes": [
-    "Bug fix"
-  ],
-  "publishedAt": "2026-06-19T19:25:38.249Z"
+  "packageName": "BambooBrowser-1.1.5-beta-win-x64.zip",
+  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.5-beta/BambooBrowser-1.1.5-beta-win-x64.zip",
+  "sha256": "63ea44d5b033193dc4a94a7b87539d3e098e993d210b50537861541d6d7164c7",
+  "size": 6541974,
+  "releaseNotes": [],
+  "publishedAt": "2026-06-19T19:54:31.656Z"
 }
