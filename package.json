@@ -1,7 +1,7 @@
 {
   "name": "bamboo-browser",
   "productName": "Bamboo Browser",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Bamboo Browser - Premium Desktop Browser",
   "main": "dist-electron/main.js",
   "type": "module",
