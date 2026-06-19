@@ -1,0 +1,16 @@
+{
+  "version": "1.1.7",
+  "channel": "stable",
+  "prerelease": false,
+  "required": false,
+  "platform": "windows",
+  "arch": "x64",
+  "packageName": "BambooBrowser-1.1.7-win-x64.zip",
+  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.7/BambooBrowser-1.1.7-win-x64.zip",
+  "sha256": "3a0ca8b713ba813fbb995d20998debb46f2960a6b2b17ba77597d3594d66429e",
+  "size": 6542279,
+  "releaseNotes": [
+    "Fixed OTA ASAR update and beta channel manifest"
+  ],
+  "publishedAt": "2026-06-19T20:28:52.446Z"
+}
