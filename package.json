@@ -1,7 +1,7 @@
 {
   "name": "bamboo-browser",
   "productName": "Bamboo Browser",
-  "version": "1.1.0-alpha.1",
+  "version": "1.1.4-beta",
   "description": "Bamboo Browser - Premium Desktop Browser",
   "main": "dist-electron/main.js",
   "type": "module",
@@ -46,6 +46,7 @@
   "build": {
     "productName": "Bamboo Browser",
     "appId": "tech.bamboo.browser",
+    "icon": "build/icon.ico",
     "directories": {
       "output": "release-build"
     },
@@ -68,7 +69,10 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Bamboo Browser",
-      "artifactName": "BambooBrowser-Setup-${version}.${ext}"
+      "artifactName": "BambooBrowser-Setup-${version}.${ext}",
+      "installerIcon": "build/installer.ico",
+      "uninstallerIcon": "build/uninstaller.ico",
+      "installerHeaderIcon": "build/icon.ico"
     },
     "publish": null
   }
