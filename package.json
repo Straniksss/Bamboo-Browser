@@ -1,12 +1,14 @@
 {
-  "name": "browser",
-  "version": "1.0.4",
+  "name": "bamboo-browser",
+  "productName": "Bamboo Browser",
+  "version": "1.0.5",
   "description": "Bamboo Browser - Premium Desktop Browser",
   "main": "dist-electron/main.js",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
+    "dist": "electron-builder",
     "preview": "vite preview",
     "release": "node scripts/release.js",
     "release:patch": "node scripts/release.js --patch",
@@ -42,8 +44,31 @@
     "vite-plugin-electron-renderer": "^1.0.0"
   },
   "build": {
+    "productName": "Bamboo Browser",
+    "appId": "tech.bamboo.browser",
+    "directories": {
+      "output": "release-build"
+    },
+    "files": [
+      "dist-client/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
     "win": {
-      "target": "dir"
+      "target": [
+        "dir",
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Bamboo Browser",
+      "artifactName": "BambooBrowser-Setup-${version}.${ext}"
     },
     "publish": null
   }
