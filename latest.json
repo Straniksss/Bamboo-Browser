@@ -1,16 +1,16 @@
 {
-  "version": "1.1.10",
+  "version": "1.1.11",
   "channel": "stable",
   "prerelease": false,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "BambooBrowser-1.1.10-win-x64.zip",
-  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.10/BambooBrowser-1.1.10-win-x64.zip",
-  "sha256": "e7c2e5991edee5048ba1fdca4ac894e762c1bcb3b18f101b17efafbdd50b1a7d",
-  "size": 13084867,
+  "packageName": "BambooBrowser-1.1.11-win-x64.zip",
+  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.11/BambooBrowser-1.1.11-win-x64.zip",
+  "sha256": "c672e20883b43fdf0957062b418bbfceb65f61ea0179ce45fa94bfd4781e349e",
+  "size": 13084855,
   "releaseNotes": [
-    "Fix OTA completely"
+    "Test OTA update"
   ],
-  "publishedAt": "2026-06-20T10:47:20.529Z"
+  "publishedAt": "2026-06-20T11:00:20.782Z"
 }
