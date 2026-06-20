@@ -1,16 +1,16 @@
 {
-  "version": "1.1.8",
+  "version": "1.1.10",
   "channel": "stable",
   "prerelease": false,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "BambooBrowser-1.1.8-win-x64.zip",
-  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.8/BambooBrowser-1.1.8-win-x64.zip",
-  "sha256": "4df03afff542af60dba438fdff18d0ceb96aec0e637e33d797405676242c0fd3",
-  "size": 6542445,
+  "packageName": "BambooBrowser-1.1.10-win-x64.zip",
+  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.10/BambooBrowser-1.1.10-win-x64.zip",
+  "sha256": "e7c2e5991edee5048ba1fdca4ac894e762c1bcb3b18f101b17efafbdd50b1a7d",
+  "size": 13084867,
   "releaseNotes": [
-    "bug fix"
+    "Fix OTA completely"
   ],
-  "publishedAt": "2026-06-19T20:37:36.553Z"
+  "publishedAt": "2026-06-20T10:47:20.529Z"
 }
