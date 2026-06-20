@@ -5,19 +5,14 @@
   "description": "Bamboo Browser - Premium Desktop Browser",
   "main": "dist-electron/main.js",
   "type": "module",
+  "author": "",
+  "license": "ISC",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
     "dist": "electron-builder",
-    "preview": "vite preview",
-    "release": "node scripts/release.js",
-    "release:patch": "node scripts/release.js --patch",
-    "release:minor": "node scripts/release.js --minor",
-    "release:major": "node scripts/release.js --major"
+    "release": "node scripts/release.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.5.17",
     "electron-store": "^11.0.2",
@@ -28,25 +23,9 @@
     "react-router-dom": "^7.18.0",
     "zustand": "^5.0.14"
   },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.3.1",
-    "@types/adm-zip": "^0.5.8",
-    "@types/node": "^25.9.3",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.2",
-    "electron": "^42.4.1",
-    "sass": "^1.101.0",
-    "tailwindcss": "^4.3.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.16",
-    "vite-plugin-electron": "^1.0.4",
-    "vite-plugin-electron-renderer": "^1.0.0"
-  },
   "build": {
     "productName": "Bamboo Browser",
     "appId": "tech.bamboo.browser",
-    "icon": "build/icon.ico",
     "directories": {
       "output": "release-build"
     },
