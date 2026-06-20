@@ -1,16 +1,16 @@
 {
-  "version": "1.1.11",
+  "version": "1.1.13",
   "channel": "stable",
   "prerelease": false,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "BambooBrowser-1.1.11-win-x64.zip",
-  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.11/BambooBrowser-1.1.11-win-x64.zip",
-  "sha256": "bed8a685da8c75cd32ccc5317dd86b23babfd074092e8ab0cf479e333eb0de7d",
-  "size": 13090412,
+  "packageName": "BambooBrowser-1.1.13-win-x64.zip",
+  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.13/BambooBrowser-1.1.13-win-x64.zip",
+  "sha256": "d2e8674ea1b9a95cf6cb93da13f10bd8b976800506e921b97239e0f035000d40",
+  "size": 13090999,
   "releaseNotes": [
-    "Добавлено меню вкладок возле кнопки + в стиле Firefox и оптимизирована скорость скачивания обновлений"
+    "bug fix"
   ],
-  "publishedAt": "2026-06-20T12:18:07.583Z"
+  "publishedAt": "2026-06-20T12:54:09.381Z"
 }
