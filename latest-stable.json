@@ -1,16 +1,16 @@
 {
-  "version": "1.1.13",
+  "version": "1.1.14",
   "channel": "stable",
   "prerelease": false,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "BambooBrowser-1.1.13-win-x64.zip",
-  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.13/BambooBrowser-1.1.13-win-x64.zip",
-  "sha256": "d2e8674ea1b9a95cf6cb93da13f10bd8b976800506e921b97239e0f035000d40",
-  "size": 13090999,
+  "packageName": "BambooBrowser-1.1.14-win-x64.zip",
+  "packageUrl": "https://github.com/Straniksss/Bamboo-Browser/releases/download/v1.1.14/BambooBrowser-1.1.14-win-x64.zip",
+  "sha256": "3acff37a30eb032e81edb1c266a2564b843e48415a8fb9746ecb2fa38d3fb99b",
+  "size": 13122816,
   "releaseNotes": [
-    "bug fix"
+    "Added smart search suggestions, enhanced password manager, custom SVG icons, improved tab management, and multiple UI/UX improvements."
   ],
-  "publishedAt": "2026-06-20T12:54:09.381Z"
+  "publishedAt": "2026-06-23T14:36:17.520Z"
 }
