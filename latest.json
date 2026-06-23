@@ -1,16 +1,16 @@
 {
-  "version": "1.1.19",
+  "version": "1.1.20",
   "channel": "stable",
   "prerelease": false,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "BambooBrowser-1.1.19-win-x64.zip",
-  "packageUrl": "https://github.com/Bamboo-Ecosystem/Bamboo-Browser/releases/download/v1.1.19/BambooBrowser-1.1.19-win-x64.zip",
-  "sha256": "72736ab2d5a70fad2e08c198b9e88048cc5d409ffb8d4076a06909571445415f",
-  "size": 13248125,
+  "packageName": "BambooBrowser-1.1.20-win-x64.zip",
+  "packageUrl": "https://github.com/Bamboo-Ecosystem/Bamboo-Browser/releases/download/v1.1.20/BambooBrowser-1.1.20-win-x64.zip",
+  "sha256": "d8bc5c7d02e18ae61f24a9462f78087a3989cb4edc739766c6cab06b83ddd0ba",
+  "size": 13250473,
   "releaseNotes": [
     "Bug Fix"
   ],
-  "publishedAt": "2026-06-23T18:20:45.142Z"
+  "publishedAt": "2026-06-23T19:14:31.113Z"
 }
