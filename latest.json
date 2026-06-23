@@ -1,17 +1,16 @@
 {
-  "version": "1.1.18",
+  "version": "1.1.19",
   "channel": "stable",
   "prerelease": false,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "BambooBrowser-1.1.18-win-x64.zip",
-  "packageUrl": "https://github.com/Bamboo-Ecosystem/Bamboo-Browser/releases/download/v1.1.18/BambooBrowser-1.1.18-win-x64.zip",
-  "sha256": "0cbaa33d6d8d69dbae42e022113e148c5acde4b006262c5db6a44a56a5648828",
-  "size": 13242187,
+  "packageName": "BambooBrowser-1.1.19-win-x64.zip",
+  "packageUrl": "https://github.com/Bamboo-Ecosystem/Bamboo-Browser/releases/download/v1.1.19/BambooBrowser-1.1.19-win-x64.zip",
+  "sha256": "72736ab2d5a70fad2e08c198b9e88048cc5d409ffb8d4076a06909571445415f",
+  "size": 13248125,
   "releaseNotes": [
-    "Добавлено сохранения капт, паролей, адресов",
     "Bug Fix"
   ],
-  "publishedAt": "2026-06-23T17:49:42.707Z"
+  "publishedAt": "2026-06-23T18:20:45.142Z"
 }
