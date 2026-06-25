@@ -95,7 +95,7 @@ function bumpVersion(version, type) {
 }
 
 const nextVersion = versionArg || bumpVersion(currentVersion, semverType || 'patch')
-const owner = process.env.GITHUB_OWNER || 'Straniksss'
+const owner = process.env.GITHUB_OWNER || 'Aventra-Technologies'
 const repo = process.env.GITHUB_REPO || 'Aventra-Browser'
 const branch = process.env.GITHUB_RELEASE_BRANCH || 'main'
 const token = process.env.GITHUB_TOKEN
@@ -266,12 +266,37 @@ async function run() {
   console.log('Staging release metadata...')
   try {
     execSync('git add package.json package-lock.json latest.json latest-*.json scripts/release.js', { stdio: 'inherit' })
-    execSync(`git commit -m "Release Aventra Browser v${nextVersion}"`, { stdio: 'inherit' })
-    execSync(`git tag v${nextVersion}`, { stdio: 'inherit' })
+    const staged = execSync('git diff --cached --name-only', { encoding: 'utf8' }).trim()
+    if (staged) {
+      execSync(`git commit -m "Release Aventra Browser v${nextVersion}"`, { stdio: 'inherit' })
+    } else {
+      console.log('No staged release metadata changes to commit.')
+    }
+  } catch (err) {
+    console.warn('Warning: git commit failed; continuing with release creation.', err.message)
+  }
+
+  try {
+    const tagExists = execSync(`git tag --list v${nextVersion}`, { encoding: 'utf8' }).trim() === `v${nextVersion}`
+    if (tagExists) {
+      console.log(`Tag v${nextVersion} already exists locally; reusing it.`)
+    } else {
+      execSync(`git tag v${nextVersion}`, { stdio: 'inherit' })
+    }
+  } catch (err) {
+    console.warn('Warning: git tag failed; continuing with release creation.', err.message)
+  }
+
+  try {
     execSync(`git push origin ${branch}`, { stdio: 'inherit' })
+  } catch (err) {
+    console.warn('Warning: git branch push failed; continuing with release creation.', err.message)
+  }
+
+  try {
     execSync(`git push origin v${nextVersion}`, { stdio: 'inherit' })
   } catch (err) {
-    console.warn('Warning: git commit/tag/push failed; continuing with GitHub release creation.', err.message)
+    console.warn('Warning: git tag push failed; continuing with release creation.', err.message)
   }
 
   console.log('Creating GitHub release...')
