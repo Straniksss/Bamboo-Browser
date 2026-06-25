@@ -7,83 +7,157 @@ import AdmZip from 'adm-zip'
 
 function loadEnv() {
   const envPath = path.join(process.cwd(), '.env')
-  if (fs.existsSync(envPath)) {
-    const content = fs.readFileSync(envPath, 'utf8')
-    content.split('\n').forEach(line => {
-      const match = line.trim().match(/^([^=]+)=(.*)$/)
-      if (match) {
-        const key = match[1].trim()
-        const value = match[2].trim().replace(/^['"]|['"]$/g, '')
-        if (!process.env[key]) {
-          process.env[key] = value
-        }
-      }
-    })
-  }
+  if (!fs.existsSync(envPath)) return
+
+  const content = fs.readFileSync(envPath, 'utf8')
+  content.split('\n').forEach(line => {
+    const match = line.trim().match(/^([^=]+)=(.*)$/)
+    if (!match) return
+
+    const key = match[1].trim()
+    const value = match[2].trim().replace(/^['"]|['"]$/g, '')
+    if (!process.env[key]) {
+      process.env[key] = value
+    }
+  })
 }
+
 loadEnv()
 
+const args = process.argv.slice(2)
 let versionArg = null
 let semverType = null
+let channel = 'stable'
+let prerelease = false
+let required = false
 
-const args = process.argv.slice(2)
 for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--version' || args[i] === '-v') {
+  const arg = args[i]
+  if (arg === '--version' || arg === '-v') {
     versionArg = args[i + 1]
     i++
-  } else if (args[i] === '--patch') {
+  } else if (arg === '--patch') {
     semverType = 'patch'
-  } else if (args[i] === '--minor') {
+  } else if (arg === '--minor') {
     semverType = 'minor'
-  } else if (args[i] === '--major') {
+  } else if (arg === '--major') {
     semverType = 'major'
+  } else if (arg === '--channel') {
+    channel = args[i + 1] || channel
+    i++
+  } else if (arg === '--beta') {
+    channel = 'beta'
+    prerelease = true
+  } else if (arg === '--alpha') {
+    channel = 'alpha'
+    prerelease = true
+  } else if (arg === '--rc') {
+    channel = 'rc'
+    prerelease = true
+  } else if (arg === '--required') {
+    required = true
   }
 }
 
-const pkgPath = path.join(process.cwd(), 'package.json')
+if (!['stable', 'alpha', 'beta', 'rc'].includes(channel)) {
+  console.error(`Invalid release channel: ${channel}`)
+  process.exit(1)
+}
+
+if (channel !== 'stable') {
+  prerelease = true
+}
+
+const root = process.cwd()
+const pkgPath = path.join(root, 'package.json')
+const lockPath = path.join(root, 'package-lock.json')
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
 const currentVersion = pkg.version
 
-let nextVersion = versionArg
-if (!nextVersion) {
-  const parts = currentVersion.split('.').map(x => parseInt(x, 10) || 0)
-  if (semverType === 'major') {
+function bumpVersion(version, type) {
+  const match = String(version).match(/^(\d+)\.(\d+)\.(\d+)(-.+)?$/)
+  if (!match) {
+    throw new Error(`Cannot bump invalid semver version: ${version}`)
+  }
+
+  const parts = [Number(match[1]), Number(match[2]), Number(match[3])]
+  if (type === 'major') {
     parts[0]++
     parts[1] = 0
     parts[2] = 0
-  } else if (semverType === 'minor') {
+  } else if (type === 'minor') {
     parts[1]++
     parts[2] = 0
   } else {
     parts[2]++
   }
-  nextVersion = parts.join('.')
+  return parts.join('.')
 }
 
-console.log(`Bumping version: ${currentVersion} -> ${nextVersion}`)
+const nextVersion = versionArg || bumpVersion(currentVersion, semverType || 'patch')
+const owner = process.env.GITHUB_OWNER || 'Straniksss'
+const repo = process.env.GITHUB_REPO || 'Aventra-Browser'
+const branch = process.env.GITHUB_RELEASE_BRANCH || 'main'
+const token = process.env.GITHUB_TOKEN
+
+console.log(`Preparing Aventra Browser release: ${currentVersion} -> ${nextVersion}`)
+console.log(`Release channel: ${channel}`)
+
+function updateJsonFile(filePath, updateFn) {
+  if (!fs.existsSync(filePath)) return
+  const json = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  updateFn(json)
+  fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n', 'utf8')
+}
+
+function syncPackageVersion() {
+  pkg.version = nextVersion
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8')
+
+  updateJsonFile(lockPath, lock => {
+    lock.name = pkg.name
+    lock.version = nextVersion
+    if (lock.packages?.['']) {
+      lock.packages[''].name = pkg.name
+      lock.packages[''].version = nextVersion
+    }
+  })
+}
+
+function createZip(zipPath, sourceDir) {
+  const zip = new AdmZip()
+  zip.addLocalFolder(sourceDir, '')
+  zip.addFile('update.json', Buffer.from(JSON.stringify({
+    version: nextVersion,
+    channel,
+    platform: 'windows',
+    arch: 'x64',
+    createdAt: new Date().toISOString()
+  }, null, 2), 'utf8'))
+  zip.writeZip(zipPath)
+}
+
+function sha256File(filePath) {
+  const hash = crypto.createHash('sha256')
+  hash.update(fs.readFileSync(filePath))
+  return hash.digest('hex')
+}
 
 function githubRequest(method, urlPath, body, contentType = 'application/json') {
   return new Promise((resolvePromise, rejectPromise) => {
-    const token = process.env.GITHUB_TOKEN
-    const owner = process.env.GITHUB_OWNER
-    const repo = process.env.GITHUB_REPO
-
-    if (!token || !owner || !repo) {
-      rejectPromise(new Error('GITHUB_TOKEN, GITHUB_OWNER, or GITHUB_REPO is missing from env.'))
+    if (!token) {
+      rejectPromise(new Error('GITHUB_TOKEN is missing from environment or .env.'))
       return
     }
 
-    let url
-    if (urlPath.startsWith('http')) {
-      url = new URL(urlPath)
-    } else {
-      url = new URL(`https://api.github.com${urlPath}`)
-    }
+    const url = urlPath.startsWith('http')
+      ? new URL(urlPath)
+      : new URL(`https://api.github.com${urlPath}`)
 
     const headers = {
-      'Authorization': `token ${token}`,
-      'User-Agent': 'BambooBrowser-Release-Script',
-      'Accept': 'application/vnd.github+json'
+      Authorization: `token ${token}`,
+      'User-Agent': 'AventraBrowser-Release-Script',
+      Accept: 'application/vnd.github+json'
     }
 
     if (body) {
@@ -91,23 +165,20 @@ function githubRequest(method, urlPath, body, contentType = 'application/json') 
       headers['Content-Length'] = Buffer.isBuffer(body) ? body.length : Buffer.byteLength(body)
     }
 
-    const options = {
+    const req = https.request({
       method,
       hostname: url.hostname,
       path: url.pathname + url.search,
       headers
-    }
-
-    const req = https.request(options, (res) => {
-      let data = []
-      res.on('data', (chunk) => data.push(chunk))
+    }, res => {
+      const chunks = []
+      res.on('data', chunk => chunks.push(chunk))
       res.on('end', () => {
-        const buffer = Buffer.concat(data)
-        const text = buffer.toString('utf8')
+        const text = Buffer.concat(chunks).toString('utf8')
         if (res.statusCode >= 200 && res.statusCode < 300) {
           try {
             resolvePromise(JSON.parse(text))
-          } catch (e) {
+          } catch {
             resolvePromise(text)
           }
         } else {
@@ -117,147 +188,92 @@ function githubRequest(method, urlPath, body, contentType = 'application/json') 
     })
 
     req.on('error', rejectPromise)
-    if (body) {
-      req.write(body)
-    }
+    if (body) req.write(body)
     req.end()
   })
 }
 
+async function uploadReleaseAsset(uploadBaseUrl, name, buffer) {
+  console.log(`Uploading ${name}...`)
+  await githubRequest(
+    'POST',
+    `${uploadBaseUrl}?name=${encodeURIComponent(name)}`,
+    buffer,
+    'application/octet-stream'
+  )
+}
+
 async function run() {
-  const token = process.env.GITHUB_TOKEN
-  const owner = process.env.GITHUB_OWNER
-  const repo = process.env.GITHUB_REPO
-  const branch = process.env.GITHUB_RELEASE_BRANCH || 'main'
-
-  if (!token) {
-    console.error('Error: GITHUB_TOKEN is missing from environment/env. Cannot perform release.')
-    process.exit(1)
-  }
-  if (!owner || !repo) {
-    console.error('Error: GITHUB_OWNER or GITHUB_REPO is missing from environment/env.')
-    process.exit(1)
-  }
-
-  console.log('Updating package.json version...')
-  pkg.version = nextVersion
-  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8')
-
-  console.log('Checking package-lock.json...')
-  const lockPath = path.join(process.cwd(), 'package-lock.json')
-  let lockfileNeedsUpdate = false
-  if (fs.existsSync(lockPath)) {
-    const lock = JSON.parse(fs.readFileSync(lockPath, 'utf8'))
-    if (lock.version !== nextVersion || (lock.packages && lock.packages[''] && lock.packages[''].version !== nextVersion)) {
-      console.log('Updating package-lock.json version...')
-      lock.version = nextVersion
-      if (lock.packages && lock.packages['']) {
-        lock.packages[''].version = nextVersion
-      }
-      fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + '\n', 'utf8')
-      lockfileNeedsUpdate = true
-    }
-  }
-
-  if (lockfileNeedsUpdate) {
-    console.log('Running npm install to ensure lockfile is fully updated...')
-    execSync('npm install', { stdio: 'inherit' })
-  }
+  syncPackageVersion()
 
   console.log('Running build...')
   execSync('npm run build', { stdio: 'inherit' })
 
-  const unpackedDir = path.join(process.cwd(), 'dist', 'win-unpacked')
+  const unpackedDir = path.join(root, 'release-build', 'win-unpacked')
   if (!fs.existsSync(unpackedDir)) {
-    console.error(`Error: Unpacked app folder not found at ${unpackedDir}`)
+    console.error(`Error: unpacked app folder not found at ${unpackedDir}`)
     process.exit(1)
   }
 
-  const zipName = `BambooBrowser-${nextVersion}-win-x64.zip`
-  console.log(`Packaging portable zip: ${zipName}...`)
-  const zip = new AdmZip()
-  zip.addLocalFolder(unpackedDir, '')
+  const zipName = `AventraBrowser-${nextVersion}-win-x64.zip`
+  const zipPath = path.join(root, 'release-build', zipName)
+  console.log(`Packaging portable zip: ${zipName}`)
+  createZip(zipPath, unpackedDir)
 
-  const updateJson = JSON.stringify({
-    version: nextVersion,
-    platform: 'windows',
-    arch: 'x64',
-    createdAt: new Date().toISOString()
-  }, null, 2)
-  zip.addFile('update.json', Buffer.from(updateJson, 'utf8'))
-
-  zip.writeZip(zipName)
-  console.log('Zip file created successfully.')
-
-  const zipBuffer = fs.readFileSync(zipName)
-  const sha256 = crypto.createHash('sha256').update(zipBuffer).digest('hex')
-  const size = zipBuffer.length
-
-  console.log('Writing latest.json...')
+  const zipBuffer = fs.readFileSync(zipPath)
   const manifest = {
     version: nextVersion,
-    required: false,
+    channel,
+    prerelease,
+    required,
     platform: 'windows',
     arch: 'x64',
     packageName: zipName,
     packageUrl: `https://github.com/${owner}/${repo}/releases/download/v${nextVersion}/${zipName}`,
-    sha256: sha256,
-    size: size,
+    sha256: sha256File(zipPath),
+    size: zipBuffer.length,
     releaseNotes: [
-      "Fixed tabs",
-      "Improved sync",
-      "Updated UI"
+      'Aventra Browser release'
     ],
     publishedAt: new Date().toISOString()
   }
-  fs.writeFileSync('latest.json', JSON.stringify(manifest, null, 2), 'utf8')
 
-  console.log('Pushing to Git repository...')
+  const latestPath = path.join(root, 'latest.json')
+  const channelManifestPath = path.join(root, `latest-${channel}.json`)
+  fs.writeFileSync(latestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8')
+  fs.writeFileSync(channelManifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8')
+
+  if (!token) {
+    console.log('GITHUB_TOKEN is missing; local release artifacts and manifests were generated only.')
+    console.log(`Zip: ${zipPath}`)
+    return
+  }
+
+  console.log('Staging release metadata...')
   try {
-    execSync('git add package.json', { stdio: 'inherit' })
-    if (fs.existsSync(lockPath)) {
-      execSync('git add package-lock.json', { stdio: 'inherit' })
-    }
-    execSync(`git commit -m "Release Bamboo Browser v${nextVersion}"`, { stdio: 'inherit' })
+    execSync('git add package.json package-lock.json latest.json latest-*.json scripts/release.js', { stdio: 'inherit' })
+    execSync(`git commit -m "Release Aventra Browser v${nextVersion}"`, { stdio: 'inherit' })
     execSync(`git tag v${nextVersion}`, { stdio: 'inherit' })
     execSync(`git push origin ${branch}`, { stdio: 'inherit' })
     execSync(`git push origin v${nextVersion}`, { stdio: 'inherit' })
   } catch (err) {
-    console.warn('Warning: Git push failed, proceeding with release creation...', err.message)
+    console.warn('Warning: git commit/tag/push failed; continuing with GitHub release creation.', err.message)
   }
 
-  console.log('Creating GitHub Release...')
-  const releaseData = await githubRequest('POST', `/repos/${owner}/${repo}/releases`, JSON.stringify({
+  console.log('Creating GitHub release...')
+  const release = await githubRequest('POST', `/repos/${owner}/${repo}/releases`, JSON.stringify({
     tag_name: `v${nextVersion}`,
     target_commitish: branch,
-    name: `v${nextVersion}`,
-    body: `Bamboo Browser v${nextVersion} Release`,
+    name: `Aventra Browser v${nextVersion}`,
+    body: `Aventra Browser v${nextVersion} release.`,
     draft: false,
-    prerelease: false
+    prerelease
   }))
 
-  console.log(`Release created successfully (ID: ${releaseData.id}).`)
-
-  console.log('Uploading latest.json...')
-  const uploadBaseUrl = releaseData.upload_url.replace(/\{.*?\}$/, '')
-  
-  const latestBuffer = fs.readFileSync('latest.json')
-  await githubRequest(
-    'POST', 
-    `${uploadBaseUrl}?name=latest.json`, 
-    latestBuffer, 
-    'application/octet-stream'
-  )
-  console.log('latest.json uploaded successfully.')
-
-  console.log(`Uploading ${zipName}...`)
-  await githubRequest(
-    'POST', 
-    `${uploadBaseUrl}?name=${encodeURIComponent(zipName)}`, 
-    zipBuffer, 
-    'application/octet-stream'
-  )
-  console.log(`${zipName} uploaded successfully.`)
+  const uploadBaseUrl = release.upload_url.replace(/\{.*?\}$/, '')
+  await uploadReleaseAsset(uploadBaseUrl, path.basename(latestPath), fs.readFileSync(latestPath))
+  await uploadReleaseAsset(uploadBaseUrl, path.basename(channelManifestPath), fs.readFileSync(channelManifestPath))
+  await uploadReleaseAsset(uploadBaseUrl, zipName, zipBuffer)
 
   console.log('Release process completed successfully.')
 }
