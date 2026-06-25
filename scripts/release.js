@@ -143,10 +143,15 @@ function sha256File(filePath) {
   return hash.digest('hex')
 }
 
-function githubRequest(method, urlPath, body, contentType = 'application/json') {
+function githubRequest(method, urlPath, body, contentType = 'application/json', redirectCount = 0) {
   return new Promise((resolvePromise, rejectPromise) => {
     if (!token) {
       rejectPromise(new Error('GITHUB_TOKEN is missing from environment or .env.'))
+      return
+    }
+
+    if (redirectCount > 5) {
+      rejectPromise(new Error('GitHub API redirect limit exceeded.'))
       return
     }
 
@@ -175,6 +180,15 @@ function githubRequest(method, urlPath, body, contentType = 'application/json') 
       res.on('data', chunk => chunks.push(chunk))
       res.on('end', () => {
         const text = Buffer.concat(chunks).toString('utf8')
+        if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
+          const nextMethod = res.statusCode === 303 ? 'GET' : method
+          const nextBody = nextMethod === 'GET' ? null : body
+          githubRequest(nextMethod, res.headers.location, nextBody, contentType, redirectCount + 1)
+            .then(resolvePromise)
+            .catch(rejectPromise)
+          return
+        }
+
         if (res.statusCode >= 200 && res.statusCode < 300) {
           try {
             resolvePromise(JSON.parse(text))
