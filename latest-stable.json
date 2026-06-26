@@ -1,16 +1,16 @@
 {
-  "version": "1.1.25",
+  "version": "1.1.26",
   "channel": "stable",
   "prerelease": false,
   "required": false,
   "platform": "windows",
   "arch": "x64",
-  "packageName": "AventraBrowser-1.1.25-win-x64.zip",
-  "packageUrl": "https://github.com/Aventra-Technologies/Aventra-Browser/releases/download/v1.1.25/AventraBrowser-1.1.25-win-x64.zip",
-  "sha256": "ab4363924362bb14546fb421de62af3600c3c70899e8ce2205105b260123819f",
-  "size": 163458055,
+  "packageName": "AventraBrowser-1.1.26-win-x64.zip",
+  "packageUrl": "https://github.com/Aventra-Technologies/Aventra-Browser/releases/download/v1.1.26/AventraBrowser-1.1.26-win-x64.zip",
+  "sha256": "48923a667e38747b2af1c766a7e434cdfd7536bc1346c150021e455fc5b268da",
+  "size": 163459876,
   "releaseNotes": [
     "Aventra Browser release"
   ],
-  "publishedAt": "2026-06-26T08:50:51.031Z"
+  "publishedAt": "2026-06-26T09:12:12.422Z"
 }
